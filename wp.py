@@ -15,7 +15,10 @@ import os.path
 import getopt
 import re
 import xmlrpclib
-import md5
+try:
+    import hashlib as md5
+except Exception, e:
+    import md5
 import functools
 import subprocess
 import getpass
@@ -265,6 +268,7 @@ if __name__ == "__main__":
         (created, changed) = get_changed_files(basedir, xml, maxUnchanged=numToCheck)
         
         for xml_post in created + changed:
+            xml_post.write( os.path.join(basedir, xml_post.filename()) )
             print "server -> local: %s" % xml_post.filename()
 
     elif args[0] == 'add':
