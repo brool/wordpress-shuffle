@@ -56,7 +56,11 @@ If you've made changes to files and you'd like to post them back, do::
 
     python wp.py push
 
-Note that push only changes those files that exist in both spots.  If you're adding a new post, use the next commands.
+To push everything (and not just the most recent files), do::
+
+    python wp.py push all
+
+Note that push only changes those files that exist in both spots.  If you're adding a new post, use the "post" command.
 
 Posting/Editing
 ---------------

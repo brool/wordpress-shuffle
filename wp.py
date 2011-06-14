@@ -259,7 +259,10 @@ if __name__ == "__main__":
             print "local -> server: %s" % xml_post.filename()
 
     elif args[0] == 'pull': 
-        (created, changed) = get_changed_files(basedir, xml)
+        numToCheck = 5
+        if len(args) > 1:
+            numToCheck = int(args[1]) if args[1] != 'all' else sys.maxint
+        (created, changed) = get_changed_files(basedir, xml, maxUnchanged=numToCheck)
         
         for xml_post in created + changed:
             print "server -> local: %s" % xml_post.filename()
