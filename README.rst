@@ -1,7 +1,7 @@
 Setting Up
 ----------
 
-Assuming that your blog is set up at http://www.yourblog.com (you can create an account at wordpress.com to test this out), all you'll need to do is:
+Assuming that your blog is set up at http://www.yourblog.com (you can create an account at wordpress.com to test this out), all you'll need to do is::
 
     -- make a directory for the blog
     mkdir blog
@@ -24,13 +24,15 @@ Seeing What's Different
 
 You can use the status command to see differences between the local file system and your blog.
 
+::
+
     python wp.py status
 
-Note that only the most recent files are checked.  If you want to really check every single file for changes, do:
+Note that only the most recent files are checked.  If you want to really check every single file for changes, do::
 
     python wp.py status all
 
-You can also use the --diff command line option to see the differences between local and server:
+You can also use the --diff command line option to see the differences between local and server::
 
     python wp.py --diff status all
 
@@ -39,16 +41,18 @@ Updating From The Blog
 
 If you've made changes through the web interface and you'd like to bring them down, you don't have to download everything again, but can instead just update.
 
+::
+
     python wp.py pull
 
-Again, only the most recent changes are brought down.  If you want to check every post on the blog, do:
+Again, only the most recent changes are brought down.  If you want to check every post on the blog, do::
 
     python wp.py pull all
 
 Posting To The Blog
 -------------------
 
-If you've made changes to files and you'd like to post them back, do:
+If you've made changes to files and you'd like to post them back, do::
 
     python wp.py push
 
@@ -57,7 +61,7 @@ Note that push only changes those files that exist in both spots.  If you're add
 Posting/Editing
 ---------------
 
-If you'd like to add a new post, put it in the drafts folder, and then do:
+If you'd like to add a new post, put it in the drafts folder, and then do::
 
     python wp.py post drafts/filename
 
