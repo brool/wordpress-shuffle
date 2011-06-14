@@ -65,11 +65,21 @@ Note that push only changes those files that exist in both spots.  If you're add
 Posting/Editing
 ---------------
 
-If you'd like to add a new post, put it in the drafts folder, and then do::
+If you'd like to add a new post, put it in the drafts folder, and then
+do::
 
     python wp.py post drafts/filename
 
-Note that add can actually take existing posts, as well -- it just forces an update of that one file, rather than running through all changes like push. 
+Note that add can actually take existing posts, as well -- it just
+forces an update of that one file, rather than running through all
+changes like push.
+
+Publishing
+----------
+
+To publish a file, just change the .post_status field from 'draft' to
+'published'.  Note that doing this will cause a copy to move from the
+drafts folder to the appropriate year/month.
 
 Gotchas
 -------
