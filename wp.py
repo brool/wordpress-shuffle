@@ -94,12 +94,13 @@ class Post:
             buffer.append(self.post['mt_text_more'].lstrip())
         return '\n'.join(buffer)
 
-    def parse(self, contents):
+    def parse(self, fname):
         self.post = {}
 
         dots = True
         description = []
-        for line in contents.split('\n'):
+        for line in file(fname, 'rt'):
+            line = line.rstrip(os.linesep)
             if dots and line and line[0] == '.':
                 pos = line.find(' ')
                 if pos != -1:
@@ -113,7 +114,7 @@ class Post:
                 description.append(line)
                 dots = False
 
-        self.post['description'] = '\n'.join(description)
+        self.post['description'] = (os.linesep).join(description)
         return self
 
     def as_dict(self):
@@ -142,10 +143,10 @@ class Post:
     def filename(self):
         fname = self.post.get('wp_slug') or Post.slugify(self.post['title']) or str(self.post['postid'])
         created = str(self.post['dateCreated'])
-        if 'draft' == (self.post.get('post_status', None) or self.post.get('page_status', None) or 'draft'):
-            return os.path.join('draft', fname)
-        elif 'page_id' in self.post:
+        if 'page_id' in self.post:
             return os.path.join('pages', fname)
+        elif self.post.get('post_status', 'draft') == 'draft':
+            return os.path.join('draft', fname)
         else:
             return os.path.join(created[0:4], created[4:6], fname)
 
@@ -176,7 +177,7 @@ def get_changed_files(basedir, xml, maxUnchanged=5):
         xml_post = Post(keys=post)
         fname = os.path.join(basedir, xml_post.filename())
         if os.path.exists(fname):
-            local_post = Post().parse(file(fname, 'rt').read())
+            local_post = Post().parse(fname)
             if xml_post.signature() != local_post.signature():
                 changed.append(xml_post)
             else:
@@ -285,7 +286,7 @@ if __name__ == "__main__":
         (created, changed) = get_changed_files(basedir, xml, maxUnchanged=numToCheck)
 
         for xml_post in changed:
-            p = Post().parse(file(os.path.join(basedir, xml_post.filename()), 'rt').read())
+            p = Post().parse(os.path.join(basedir, xml_post.filename()))
             xml.edit_post(p.id(), p.as_dict())
             print "local -> server: %s" % xml_post.filename()
 
@@ -302,7 +303,7 @@ if __name__ == "__main__":
     elif args[0] == 'add':
         for fname in args[1:]:
             try:
-                p = Post().parse( file(fname, 'rt').read() )
+                p = Post().parse(fname)
                 if p.id():
                     xml.edit_post( p.id(), p.as_dict() )
                     print "edited on server: %s" % fname
