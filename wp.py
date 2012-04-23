@@ -45,6 +45,9 @@ class Post:
     # fields that are ignored when comparing signatures
     ignore_fields = set([ 'custom_fields', 'sticky', 'date_created_gmt' ])
 
+    # fields that need to be handled special when rendering
+    special_fields = set([ 'description', 'mt_text_more' ])
+
     # fields that should not be edited locally
     read_only_fields = set([ 'dateCreated', 'date_created_gmt' ])
 
@@ -61,12 +64,14 @@ class Post:
         buffer = []
         lst = self.post.keys()
         lst.sort()
-        lst.remove('description')
         for key in lst:
-            if key not in Post.ignore_fields:
+            if key not in Post.ignore_fields and key not in Post.special_fields:
                 buffer.append ( ".%s %s" % (key, self.post[key] ))
-        buffer.append(self.post['description']) 
-        return '\n'.join(map(lambda x: x, buffer))
+        buffer.append(self.post['description'].rstrip()) 
+        if self.post.get('mt_text_more', ''):
+            buffer.append('<!--more-->')
+            buffer.append(self.post['mt_text_more'].lstrip())
+        return '\n'.join(buffer)
 
     def parse(self, contents):
         self.post = {}
