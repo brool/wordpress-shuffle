@@ -23,6 +23,21 @@ import functools
 import subprocess
 import getpass
 import tempfile
+import itertools
+
+# c.f. http://docs.python.org/library/itertools.html
+def roundrobin(*iterables):
+    "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
+    # Recipe credited to George Sakkis
+    pending = len(iterables)
+    nexts = itertools.cycle(iter(it).next for it in iterables)
+    while pending:
+        try:
+            for next in nexts:
+                yield next()
+        except StopIteration:
+            pending -= 1
+            nexts = itertools.cycle(itertools.islice(nexts, pending))
 
 class BlogXMLRPC:
     """BlogXMLRPC.  Wrapper for the XML/RPC calls to the blog."""
@@ -32,12 +47,18 @@ class BlogXMLRPC:
         self.get_recent = functools.partial(self.xrpc.metaWeblog.getRecentPosts, 1, self.user, self.password, 5)
         self.new_post = functools.partial(self.xrpc.metaWeblog.newPost, 1, self.user, self.password)
     def get_all(self):
-        for post in self.xrpc.metaWeblog.getRecentPosts(1, self.user, self.password, 20):
+        posts = self.xrpc.metaWeblog.getRecentPosts(1, self.user, self.password, 20)
+        pages = self.xrpc.wp.getPages(1, self.user, self.password, 20)
+        for p in roundrobin(posts, pages):
+            yield p
+        for post in self.xrpc.wp.getPages(1, self.user, self.password, 32767)[20:]:
             yield post
         for post in self.xrpc.metaWeblog.getRecentPosts(1, self.user, self.password, 32767)[20:]:
             yield post
-    def get_post(self, post_id): return self.xrpc.metaWeblog.getPost(post_id, self.user, self.password)
-    def edit_post(self, post_id, post): return self.xrpc.metaWeblog.editPost(post_id, self.user, self.password, post, True)
+    def get_post(self, post_id): 
+        return self.xrpc.metaWeblog.getPost(post_id, self.user, self.password)
+    def edit_post(self, post_id, post): 
+        return self.xrpc.metaWeblog.editPost(post_id, self.user, self.password, post, True)
 
 class Post:
     """Post.  A set of key => value pairs."""
@@ -121,8 +142,10 @@ class Post:
     def filename(self):
         fname = self.post.get('wp_slug') or Post.slugify(self.post['title']) or str(self.post['postid'])
         created = str(self.post['dateCreated'])
-        if self.post.get('post_status', 'draft') == 'draft':
+        if 'draft' == (self.post.get('post_status', None) or self.post.get('page_status', None) or 'draft'):
             return os.path.join('draft', fname)
+        elif 'page_id' in self.post:
+            return os.path.join('pages', fname)
         else:
             return os.path.join(created[0:4], created[4:6], fname)
 
@@ -296,6 +319,3 @@ if __name__ == "__main__":
             except Exception, e:
                 print "wp:", e
                 sys.exit(1)
-
-                
-        
