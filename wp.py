@@ -95,6 +95,8 @@ class Post:
         return '\n'.join(buffer)
 
     def parse(self, fname):
+        is_page = os.path.split(os.path.abspath(fname))[0].endswith('/pages')
+
         self.post = {}
 
         dots = True
@@ -113,6 +115,9 @@ class Post:
             else:
                 description.append(line)
                 dots = False
+
+        if is_page and 'page_status' not in self.post:
+            self.post['page_status'] = 'draft'
 
         self.post['description'] = (os.linesep).join(description)
         return self
@@ -164,6 +169,9 @@ class Post:
         except Exception, e:
             print "wp:", e
             pass
+
+    def is_page(self):
+        return 'page_status' in self.post
 
 def get_changed_files(basedir, xml, maxUnchanged=5):
     """Compare the local file system with the blog to see what files have changed.
