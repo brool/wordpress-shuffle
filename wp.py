@@ -55,10 +55,20 @@ class BlogXMLRPC:
             yield post
         for post in self.xrpc.metaWeblog.getRecentPosts(1, self.user, self.password, 32767)[20:]:
             yield post
-    def get_post(self, post_id): 
-        return self.xrpc.metaWeblog.getPost(post_id, self.user, self.password)
-    def edit_post(self, post_id, post): 
-        return self.xrpc.metaWeblog.editPost(post_id, self.user, self.password, post, True)
+    def get_post(self, post_id): return self.xrpc.metaWeblog.getPost(post_id, self.user, self.password)
+    def edit_post(self, post_id, post): return self.xrpc.metaWeblog.editPost(post_id, self.user, self.password, post, True)
+    def get_page(self, page_id): return self.xrpc.wp.getPage(1, page_id, self.user, self.password)
+    def edit_page(self, page_id, page): return self.xrpc.wp.editPage(1, page_id, self.user, self.password, page, True)
+    def new_page(self, page): return self.xrpc.wp.newPage(1, self.user, self.password, page, True)
+    def create(self, p):
+        if p.is_page():
+            return self.new_page(p.as_dict())
+        else:
+            return self.new_post(p.as_dict())
+    def edit(self, p):
+        fn = p.is_page() and self.edit_page or self.edit_post
+        return fn(p.id(), p.as_dict())
+        # return self.edit_post(p.id(), p.as_dict())
 
 class Post:
     """Post.  A set of key => value pairs."""
@@ -156,7 +166,7 @@ class Post:
             return os.path.join(created[0:4], created[4:6], fname)
 
     def id(self):
-        return int(self.post.get('postid', 0))
+        return int(self.post.get('postid', 0)) or int(self.post.get('page_id', 0))
 
     def signature(self):
         return md5.md5(str(self).strip()).digest()
@@ -295,7 +305,7 @@ if __name__ == "__main__":
 
         for xml_post in changed:
             p = Post().parse(os.path.join(basedir, xml_post.filename()))
-            xml.edit_post(p.id(), p.as_dict())
+            xml.edit(p)
             print "local -> server: %s" % xml_post.filename()
 
     elif args[0] == 'pull': 
@@ -313,13 +323,16 @@ if __name__ == "__main__":
             try:
                 p = Post().parse(fname)
                 if p.id():
-                    xml.edit_post( p.id(), p.as_dict() )
+                    xml.edit(p)
                     print "edited on server: %s" % fname
                 else:
-                    id = xml.new_post( p.as_dict() )
+                    post_id = xml.create( p )
 
                     # since it's a new post, get it back again and write it out
-                    np = Post(keys = xml.get_post( id ))
+                    if p.is_page():
+                        np = Post(keys = xml.get_page( post_id ))
+                    else:
+                        np = Post(keys = xml.get_post( post_id ))
                     newname = os.path.join( basedir, np.filename() )
                     np.write(newname)
                     print "posted: %s -> %s" % (fname, np.filename())
