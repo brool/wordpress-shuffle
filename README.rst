@@ -17,6 +17,8 @@ Assuming that your blog is set up at http://www.yourblog.com (you can create an 
 
 The files are downloaded in the appropriate YYYY/MM directories, with the draft directory being used for all of your unpublished drafts.
 
+Pages (whether draft or not) are stored in a directory named "pages."
+
 All the drafts are stored in plain text, but you'll see some lines starting with periods -- these are various Wordpress variables that are associated with the file.  You can change them, as well;  for example, to change the title of the post, just change the line that begins with ".title". 
 
 Seeing What's Different
@@ -65,8 +67,8 @@ Note that push only changes those files that exist in both spots.  If you're add
 Posting/Editing
 ---------------
 
-If you'd like to add a new post, put it in the drafts folder, and then
-do::
+If you'd like to add a new post, put it in the drafts or pages folder,
+as appropriate, and then do::
 
     python wp.py add drafts/filename
 
@@ -88,5 +90,3 @@ There are some gotchas due to the fact that the filename can change on you.  The
 
 - You post a file without a .title or .wp_slug line
 - You post a file with a different file name than the slug that is generated (i.e., "my-first-draft" when the title is actually "my final draft")
-
-
