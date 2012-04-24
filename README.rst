@@ -60,7 +60,7 @@ To push everything (and not just the most recent files), do::
 
     python wp.py push all
 
-Note that push only changes those files that exist in both spots.  If you're adding a new post, use the "post" command.
+Note that push only changes those files that exist in both spots.  If you're adding a new post, use the "add" command.
 
 Posting/Editing
 ---------------
@@ -68,7 +68,7 @@ Posting/Editing
 If you'd like to add a new post, put it in the drafts folder, and then
 do::
 
-    python wp.py post drafts/filename
+    python wp.py add drafts/filename
 
 Note that add can actually take existing posts, as well -- it just
 forces an update of that one file, rather than running through all
