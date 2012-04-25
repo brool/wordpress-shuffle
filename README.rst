@@ -94,7 +94,7 @@ There are some gotchas due to the fact that the filename can change on you.  The
 Troubleshooting
 ---------------
 
-You may experience some difficulties if your wordpress installation is not generating proper XML responses. If this is the case, and you are getting errors like, "XML Parsing Error: XML or text declaration not at start of entity at line 3 col 0", then you may try the following patch to your wordpress /xmlrpc.php file:
+You may experience some difficulties if your Wordpress installation is not generating proper XML responses. If this is the case, and you are getting errors like, "XML Parsing Error: XML or text declaration not at start of entity at line 3 col 0", then you may try the following patch to your wordpress /xmlrpc.php file:
 
 Wrap the wp-load.php include in PHP output buffer.
 
