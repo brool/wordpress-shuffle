@@ -90,3 +90,19 @@ There are some gotchas due to the fact that the filename can change on you.  The
 
 - You post a file without a .title or .wp_slug line
 - You post a file with a different file name than the slug that is generated (i.e., "my-first-draft" when the title is actually "my final draft")
+
+Troubleshooting
+---------------
+
+You may experience some difficulties if your wordpress installation is not generating proper XML responses. If this is the case, and you are getting errors like, "XML Parsing Error: XML or text declaration not at start of entity at line 3 col 0", then you may try the following patch to your wordpress /xmlrpc.php file:
+
+Wrap the wp-load.php include in PHP output buffer.
+
+      ob_start();
+      include('./wp-load.php');
+      ob_end_clean();
+
+This will prevent any output from being rendered before the XML is sent in the response.
+
+
+
